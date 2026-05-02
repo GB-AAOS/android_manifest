@@ -86,13 +86,16 @@ source build/envsetup.sh
 lunch gbrpi4_car-bp4a-userdebug      # or gbrpi5_car-bp4a-userdebug
 ```
 
-| target                          | board   | variant | build ID |
-|--------------------------------|---------|---------|----------|
-| `gbrpi4_car-bp4a-userdebug`     | Pi 4    | Automotive | bp4a |
-| `gbrpi5_car-bp4a-userdebug`     | Pi 5    | Automotive | bp4a |
+| target                          | device          | variant   | build instructions |
+|--------------------------------|-----------------|-----------|--------------------|
+| `gbrpi4_car-bp4a-userdebug`     | Pi 4 (hardware) | Automotive | steps 4–5 below |
+| `gbrpi5_car-bp4a-userdebug`     | Pi 5 (hardware) | Automotive | steps 4–5 below |
+| `tonal_emulator-bp4a-userdebug` | x86_64 emulator | Phone with fake proximity sensor + monitor app | <https://github.com/GB-AAOS/device-gborges-tonal_emulator> |
 
 Build ID `bp4a` matches AOSP's `android-16.0.0_r4` release. The variant
-suffix can be `user`, `userdebug`, or `eng`.
+suffix can be `user`, `userdebug`, or `eng`. Steps 4 and 5 below cover
+**only** the Pi targets — for `tonal_emulator`, follow the linked repo
+instead.
 
 ### 4. Compile
 
@@ -122,13 +125,6 @@ device is found, so they are safe to run interactively.
 
 See `device/gborges/README.md` for board-specific config (CAN bus on
 Waveshare RS485 CAN HAT, GPIO via libgpiod, board/variant split, etc.).
-
-## Other targets
-
-The manifest also pulls `device/gborges/tonal_emulator`, a phone-emulator
-target with a fake proximity sensor and monitor app. Build and run
-instructions live with that project — see
-<https://github.com/GB-AAOS/device-gborges-tonal_emulator>.
 
 ## Bumping
 
