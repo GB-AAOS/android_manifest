@@ -13,15 +13,11 @@
   Order matters: google/ must come first so the <remove-project> directives
   in raspberry-vanilla/ can resolve their targets. gborges sits last to
   override anything in either source if needed.
-
-  Optional: uncomment the remove_projects.xml include below to strip unused
-  device/* and prebuilt projects (shrinks `repo sync` substantially —
-  matches the upstream raspberry-vanilla "shallow clone" recipe).
 -->
 <manifest>
   <include name="google/default.xml" />
   <include name="raspberry-vanilla/manifest_brcm_rpi.xml" />
   <include name="raspberry-vanilla/manifest_utilities.xml" />
-  <!-- <include name="raspberry-vanilla/remove_projects.xml" /> -->
+  <include name="raspberry-vanilla/remove_projects.xml" />
   <include name="gborges.xml" />
 </manifest>

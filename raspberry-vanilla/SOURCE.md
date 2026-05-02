@@ -17,7 +17,7 @@ Pi-specific projects on top of the AOSP base in `../google/`.
 |---|---|---|
 | `manifest_brcm_rpi.xml`   | yes | core Pi projects (device/brcm/*, vendor/brcm, replacements for build/, camera, ffmpeg, graphics, …) |
 | `manifest_utilities.xml`  | yes | Raspberry Pi utils + V4L utils replacement |
-| `remove_projects.xml`     | **no** | strips unused device/* and prebuilt projects to shrink the sync; opt in by uncommenting the include in `../default.xml` |
+| `remove_projects.xml`     | yes | strips unused device/* and prebuilt projects to shrink the sync; opt in by uncommenting the include in `../default.xml` |
 | `README.md`               | n/a | upstream's project README, kept for reference (not parsed by repo) |
 
 ## Updating
