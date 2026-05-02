@@ -1,7 +1,15 @@
 # google/ snapshot
 
-Verbatim copy of the AOSP platform manifest, used as the AOSP base for
-this manifest.
+Near-verbatim copy of the AOSP platform manifest, used as the AOSP base
+for this manifest. **One** intentional deviation from upstream:
+
+- The `aosp` remote's `fetch=".."` is rewritten to
+  `fetch="https://android.googlesource.com/"`. Upstream uses a relative
+  URL because their manifest lives at `android.googlesource.com/platform/manifest`,
+  so `..` resolves to the right host. Our manifest lives on GitHub
+  (`github.com/GB-AAOS/android_manifest`), so `..` would resolve under
+  `github.com/` and every AOSP project (`platform/*`) would 404. The
+  bump procedure below re-applies this rewrite.
 
 | field | value |
 |---|---|
@@ -19,6 +27,9 @@ To bump to a newer AOSP release tag (e.g. `android-16.0.0_r5`):
 git clone https://android.googlesource.com/platform/manifest /tmp/aosp-manifest
 git -C /tmp/aosp-manifest checkout refs/tags/<new-tag>
 cp /tmp/aosp-manifest/default.xml manifest/google/default.xml
+# Re-apply the aosp remote rewrite (see deviation note above):
+sed -i 's|fetch="\.\."|fetch="https://android.googlesource.com/"|' \
+    manifest/google/default.xml
 git -C /tmp/aosp-manifest rev-parse HEAD       # → update snapshot commit above
 ```
 
