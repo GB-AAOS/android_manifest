@@ -93,10 +93,7 @@ lunch gbrpi4_car-bp4a-userdebug      # or any target from the table below
 | `tonal_emulator-bp4a-userdebug` | x86_64 emulator | Automotive demo with fake proximity sensor + monitor app | bp4a |
 
 Build ID `bp4a` matches AOSP's `android-16.0.0_r4` release. The variant
-suffix can be `user`, `userdebug`, or `eng`. (Upstream `tonal_emulator`'s
-README still references `trunk_staging` from when it tracked
-android-15.0.0_r20 — fall back to `tonal_emulator-trunk_staging-userdebug`
-if the `bp4a` build ID isn't yet declared in the device repo.)
+suffix can be `user`, `userdebug`, or `eng`.
 
 ### 4. Compile
 
