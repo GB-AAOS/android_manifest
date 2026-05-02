@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Raspberry Vanilla projects — merged from upstream
+  https://github.com/raspberry-vanilla/android_local_manifest
+  (manifest_brcm_rpi.xml + manifest_utilities.xml).
+
+  Every project below is pinned to a specific commit SHA so this manifest
+  is reproducible: re-running `repo sync` will not pull in newer upstream
+  changes. To bump, edit the revision="..." attributes in this file.
+
+  SHAs captured 2026-05-02 from the working checkout under /mnt/build/aosp.
+-->
+<manifest>
+  <remote name="github" fetch="https://github.com/" />
+
+  <!-- Raspberry Pi -->
+  <project path="device/brcm/rpi4" name="raspberry-vanilla/android_device_brcm_rpi4" remote="github" revision="899f0b289af58b5cd1bc327cf53bf89e75696a46" upstream="android-16.0">
+    <linkfile src="mkimg.sh" dest="rpi4-mkimg.sh" />
+    <linkfile src="wrimg.sh" dest="rpi4-wrimg.sh" />
+  </project>
+  <project path="device/brcm/rpi5" name="raspberry-vanilla/android_device_brcm_rpi5" remote="github" revision="087923cded540bc59ebea30a75f4f80286358c15" upstream="android-16.0">
+    <linkfile src="mkimg.sh" dest="rpi5-mkimg.sh" />
+    <linkfile src="wrimg.sh" dest="rpi5-wrimg.sh" />
+  </project>
+  <project path="device/brcm/rpi4-kernel" name="raspberry-vanilla/android_device_brcm_rpi4-kernel" remote="github" revision="3e6af2e989ba6c7c089adadd11e598ccb8f7b916" upstream="android-16.0" />
+  <project path="device/brcm/rpi5-kernel" name="raspberry-vanilla/android_device_brcm_rpi5-kernel" remote="github" revision="42473a1142999739fe980dfe3d5ceb1e45b7d97a" upstream="android-16.0" />
+  <project path="vendor/brcm" name="raspberry-vanilla/proprietary_vendor_brcm" remote="github" revision="83f87c1733ef992060f2996e94c7152f4521fd0d" upstream="android-16.0" />
+
+  <!-- Audio -->
+  <project path="external/alsa-lib" name="raspberry-vanilla/android_external_alsa-lib" remote="github" revision="5bd53f2c0a909a2c2a98aad8a7788be82324ad58" upstream="android-16.0" />
+  <project path="external/alsa-utils" name="raspberry-vanilla/android_external_alsa-utils" remote="github" revision="86e58921c52a47cb4654cae0cff2f30db6c7beaa" upstream="android-16.0" />
+
+  <!-- Build -->
+  <remove-project name="platform/build" />
+  <remove-project name="platform/build/soong" />
+  <project path="build/make" name="raspberry-vanilla/android_build" remote="github" revision="b815dded1eafbf06191a6ae306956bb6ed6fb415" upstream="android-16.0">
+    <linkfile src="CleanSpec.mk" dest="build/CleanSpec.mk" />
+    <linkfile src="buildspec.mk.default" dest="build/buildspec.mk.default" />
+    <linkfile src="core" dest="build/core" />
+    <linkfile src="envsetup.sh" dest="build/envsetup.sh" />
+    <linkfile src="target" dest="build/target" />
+    <linkfile src="tools" dest="build/tools" />
+  </project>
+  <project path="build/soong" name="raspberry-vanilla/android_build_soong" remote="github" revision="f389fa2a2a768a93bc99957e2288f3fbee032bff" upstream="android-16.0">
+    <linkfile src="root.bp" dest="Android.bp" />
+    <linkfile src="bootstrap.bash" dest="bootstrap.bash" />
+  </project>
+
+  <!-- Camera -->
+  <remove-project name="platform/external/libcamera" />
+  <project path="external/libcamera" name="raspberry-vanilla/android_external_libcamera" remote="github" revision="eeca06caf7d1d6070f7152590f574c513da64f1a" upstream="android-16.0" />
+  <project path="external/libpisp" name="raspberry-vanilla/android_external_libpisp" remote="github" revision="1353aea28461b3c5be391e8ebf9f79496d60ea00" upstream="android-16.0" />
+  <project path="external/libyuv_chromium" name="raspberry-vanilla/android_external_libyuv_chromium" remote="github" revision="0e419c1b22c4f8827205ffcd8e53e3bd8edd8d34" upstream="android-16.0" />
+
+  <!-- FFmpeg -->
+  <remove-project name="platform/external/libudev-zero" />
+  <project path="external/ffmpeg" name="raspberry-vanilla/android_external_ffmpeg" remote="github" revision="c2fa9afe4f30adffd09ae35c56cb843b5cf80372" upstream="android-16.0" />
+  <project path="external/ffmpeg_codec2" name="raspberry-vanilla/android_external_ffmpeg_codec2" remote="github" revision="1cb7fcee97f3cedd46857f3cd8354777bed307b2" upstream="android-16.0" />
+  <project path="external/libudev-zero" name="raspberry-vanilla/android_external_libudev-zero" remote="github" revision="6f093b428ecae5138654b61d7f29871cef8739dc" upstream="android-16.0" />
+
+  <!-- Graphics -->
+  <remove-project name="platform/external/drm_hwcomposer" />
+  <remove-project name="platform/external/minigbm" />
+  <project path="external/drm_hwcomposer" name="raspberry-vanilla/android_external_drm_hwcomposer" remote="github" revision="2d6edb1dfb64dca30c07a5b4b957f3766ebb63db" upstream="android-16.0" />
+  <project path="external/mesa3d-rpi" name="raspberry-vanilla/android_external_mesa3d-rpi" remote="github" revision="0558d54056a716e260c8ad0bb49dab0c794981c9" upstream="android-16.0" />
+  <project path="external/minigbm" name="raspberry-vanilla/android_external_minigbm" remote="github" revision="3824dd9f97d64597ee1b3636b10e8597b529b749" upstream="android-16.0" />
+
+  <!-- ninja-to-soong -->
+  <remove-project name="platform/external/rust/ninja-to-soong" />
+  <project path="external/rust/ninja-to-soong" name="raspberry-vanilla/android_external_rust_ninja-to-soong" remote="github" revision="9d30ce802e67938060b83cc9f85aaded83d256da" upstream="android-16.0" />
+
+  <!-- v4l2_codec2 -->
+  <remove-project name="platform/external/v4l2_codec2" />
+  <project path="external/v4l2_codec2" name="raspberry-vanilla/android_external_v4l2_codec2" remote="github" revision="eb594b7f46997c7d5f3fe8bf36011b507b0746dc" upstream="android-16.0" />
+
+  <!-- Raspberry Pi utils -->
+  <project path="external/raspberrypi-utils" name="raspberry-vanilla/android_external_raspberrypi-utils" remote="github" revision="09032c316410d7475f78e4a0092d0f62ad81d8e9" upstream="android-16.0" />
+
+  <!-- V4L utils -->
+  <remove-project name="platform/external/v4l-utils" />
+  <project path="external/v4l-utils" name="raspberry-vanilla/android_external_v4l-utils" remote="github" revision="b9a68f0b37250f57b7b61becb37250d668693324" upstream="android-16.0" />
+
+</manifest>

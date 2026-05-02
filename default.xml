@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  gborges AOSP manifest — composes:
+    1. aosp.xml — verbatim copy of platform/manifest @ refs/tags/android-16.0.0_r4
+    2. brcm.xml — Raspberry Vanilla projects
+       (https://github.com/raspberry-vanilla/android_local_manifest)
+       pinned to specific commit SHAs (no floating branches)
+
+  Order matters: aosp.xml must come first so the <remove-project> directives
+  in brcm.xml can resolve their targets.
+-->
+<manifest>
+  <include name="aosp.xml" />
+  <include name="brcm.xml" />
+</manifest>
