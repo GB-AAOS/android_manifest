@@ -9,6 +9,9 @@ combination of:
 with a single git repo that vendors both upstreams as folder snapshots, plus
 gborges-owned projects on top.
 
+**Repo URL:** <https://github.com/GB-AAOS/android_manifest>
+**Branch:** `main`
+
 ## Layout
 
 ```
@@ -20,7 +23,7 @@ manifest/
 ├── raspberry-vanilla/      verbatim snapshot of raspberry-vanilla/android_local_manifest
 │   ├── manifest_brcm_rpi.xml   wired in
 │   ├── manifest_utilities.xml  wired in
-│   ├── remove_projects.xml     available, not wired (opt-in for shallow sync)
+│   ├── remove_projects.xml     wired in (strips unused device/* + prebuilts)
 │   ├── README.md               upstream's README, kept for reference
 │   └── SOURCE.md               provenance + bump procedure
 └── gborges.xml             gborges-owned projects (GB-AAOS/*)
@@ -39,11 +42,10 @@ upstreams as of the snapshot commit recorded in each folder's `SOURCE.md`.
 2. `raspberry-vanilla/manifest_brcm_rpi.xml` — `<remove-project>` + project
    overrides for build/, camera, ffmpeg, graphics, etc.
 3. `raspberry-vanilla/manifest_utilities.xml` — Pi-utils + V4L-utils.
-4. `gborges.xml` — last, so it can override anything above.
-
-`remove_projects.xml` is commented out in `default.xml`. Uncomment it to
-strip unused `device/amlogic`, `device/linaro`, and similar projects from
-the sync — matches the upstream raspberry-vanilla shallow-clone recipe.
+4. `raspberry-vanilla/remove_projects.xml` — strips unused `device/amlogic`,
+   `device/linaro`, etc. to shrink `repo sync`.
+5. `gborges.xml` — last, so it can override anything above. Currently
+   declares `device/gborges` and the nested `device/gborges/tonal_emulator`.
 
 ## Reproducibility model
 
@@ -56,27 +58,79 @@ will pull the current HEAD of the branches they name.
 
 If you need stricter pinning (every project locked to a specific commit
 SHA so re-syncs never drift), replace branch names with SHAs inside the
-snapshot XMLs after copying them in. Trade-off: you lose the
-"verbatim upstream" property and have to do the SHA-rewrite step on every
-bump.
+snapshot XMLs after copying them in.
 
-## Using it
+## Build
 
-Publish this directory as a git repo (any host), then on a fresh tree:
+### 1. Prerequisites (Ubuntu 22.04+)
+
+Set up the [Android build environment](https://source.android.com/docs/setup/start/requirements),
+then add:
 
 ```sh
-repo init -u <manifest-repo-url> -b <branch>
+sudo apt-get install dosfstools e2fsprogs fdisk kpartx mtools rsync
+```
+
+### 2. Initialise and sync
+
+```sh
+mkdir aosp && cd aosp
+repo init -u https://github.com/GB-AAOS/android_manifest -b main
 repo sync -j$(nproc)
 ```
 
-Local testing without publishing:
+### 3. Lunch a target
 
 ```sh
-repo init -u file:///mnt/build/aosp/manifest -b main
+source build/envsetup.sh
+lunch gbrpi4_car-bp4a-userdebug      # or any target from the table below
 ```
 
-(requires the manifest dir to be a git repo with at least one commit on the
-named branch — already initialised here on `main`).
+| target                     | board | variant | build ID |
+|---------------------------|-------|---------|----------|
+| `gbrpi4_car-bp4a-userdebug` | Pi 4  | Automotive | bp4a |
+| `gbrpi5_car-bp4a-userdebug` | Pi 5  | Automotive | bp4a |
+
+Build ID `bp4a` matches AOSP's `android-16.0.0_r4` release. The variant
+suffix can be `user`, `userdebug`, or `eng`.
+
+### 4. Compile
+
+```sh
+make bootimage systemimage vendorimage -j$(nproc)
+```
+
+`bootimage`, `systemimage`, and `vendorimage` are the three partition
+images the flashable `.img` builder needs. A full `make -j$(nproc)` also
+works but takes longer and produces nothing the SD-card image can use that
+the three partition targets don't already cover.
+
+### 5. Package a flashable image
+
+The tree root has symlinks to the device image scripts:
+
+```sh
+./rpi4-mkimg.sh      # writes a flashable .img into ${ANDROID_PRODUCT_OUT}
+./rpi5-mkimg.sh      # Pi 5 equivalent
+```
+
+Pick the script that matches the board you lunched — they are not
+interchangeable.
+
+### 6. Flash to SD
+
+```sh
+./rpi4-wrimg.sh             # boot + system + vendor (probes /dev/sd[a-f])
+./rpi4-wrimg.sh boot        # single partition
+./rpi4-wrimg.sh wipe        # reformat metadata + userdata
+```
+
+`rpi5-wrimg.sh` is the Pi 5 equivalent. Both probe the SD card layout
+(boot=128M, system=3072M, vendor=384M, metadata=16M) and bail out if no
+matching device is found, so they are safe to run interactively.
+
+See `device/gborges/README.md` for board-specific config (CAN bus on
+Waveshare RS485 CAN HAT, GPIO via libgpiod, board/variant split, etc.).
 
 ## Bumping
 
@@ -86,8 +140,7 @@ named branch — already initialised here on `main`).
 - **Raspberry Vanilla** — see `raspberry-vanilla/SOURCE.md`. Re-clone the
   upstream repo, check out `android-16.0`, copy the four files over,
   update the SHA/date/subject rows in `SOURCE.md`.
-- **gborges** — edit `revision="..."` in `gborges.xml` directly. Tracks
-  `main` of `GB-AAOS/device_gborges` (and any future GB-AAOS projects
-  added to that file).
+- **gborges** — edit `revision="..."` in `gborges.xml` directly. Each
+  GB-AAOS project tracks `main`.
 
 After any bump, commit the manifest repo and re-`repo sync` consumers.

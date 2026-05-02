@@ -9,5 +9,6 @@
   <remote name="gb-aaos" fetch="https://github.com/GB-AAOS/" />
 
   <project path="device/gborges" name="device_gborges" remote="gb-aaos" upstream="main" />
+  <project path="device/gborges/tonal_emulator" name="device-gborges-tonal_emulator" remote="gb-aaos" upstream="main" />
 
 </manifest>
