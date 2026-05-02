@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  gborges-owned projects. Pinned to specific commit SHAs for reproducibility,
+  same policy as brcm.xml. Bump revision="..." here when advancing.
+
+  SHAs captured 2026-05-02 from the working checkout under /mnt/build/aosp.
+-->
+<manifest>
+  <remote name="gb-aaos" fetch="https://github.com/GB-AAOS/" />
+
+  <project path="device/gborges" name="device_gborges" remote="gb-aaos" revision="6a75dcd94cfca65f363febae5aedaa1f53cfeaf2" upstream="main" />
+
+</manifest>

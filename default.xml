@@ -1,15 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
   gborges AOSP manifest — composes:
-    1. aosp.xml — verbatim copy of platform/manifest @ refs/tags/android-16.0.0_r4
-    2. brcm.xml — Raspberry Vanilla projects
-       (https://github.com/raspberry-vanilla/android_local_manifest)
-       pinned to specific commit SHAs (no floating branches)
+    1. aosp.xml    — verbatim copy of platform/manifest @ refs/tags/android-16.0.0_r4
+    2. brcm.xml    — Raspberry Vanilla projects
+                     (https://github.com/raspberry-vanilla/android_local_manifest)
+                     pinned to specific commit SHAs (no floating branches)
+    3. gborges.xml — gborges-owned projects (device/gborges, …) from
+                     https://github.com/GB-AAOS, also pinned to SHAs
 
   Order matters: aosp.xml must come first so the <remove-project> directives
-  in brcm.xml can resolve their targets.
+  in brcm.xml can resolve their targets. gborges.xml comes last so it can
+  override anything in either file if needed.
 -->
 <manifest>
   <include name="aosp.xml" />
   <include name="brcm.xml" />
+  <include name="gborges.xml" />
 </manifest>

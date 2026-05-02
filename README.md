@@ -10,16 +10,21 @@ with a single, reproducible source.
 
 ## Files
 
-- `default.xml` — top-level. `<include>`s the two below.
+- `default.xml` — top-level. `<include>`s the three below in order.
 - `aosp.xml` — verbatim copy of `platform/manifest @ refs/tags/android-16.0.0_r4`
   (1045 lines). Re-copy from upstream when bumping the AOSP base version.
 - `brcm.xml` — Raspberry Vanilla projects merged from upstream
   ([raspberry-vanilla/android_local_manifest](https://github.com/raspberry-vanilla/android_local_manifest))
   with every `revision="android-16.0"` replaced by a specific commit SHA.
   No floating branches — sync results are reproducible.
+- `gborges.xml` — gborges-owned projects from
+  [GB-AAOS](https://github.com/GB-AAOS) (currently `device/gborges` →
+  [device_gborges](https://github.com/GB-AAOS/device_gborges)). Same SHA-pin
+  policy as `brcm.xml`.
 
-`aosp.xml` includes first; `brcm.xml`'s `<remove-project>` directives
-depend on AOSP entries already being present.
+Include order: aosp → brcm → gborges. brcm's `<remove-project>` directives
+depend on AOSP entries already being present; gborges sits last so it can
+override anything in either file if needed.
 
 ## Using it
 
@@ -41,17 +46,17 @@ named branch).
 
 ## Bumping pinned SHAs
 
-The SHAs in `brcm.xml` were captured from the working checkout on
-2026-05-02. To advance to newer upstream:
+The SHAs in `brcm.xml` and `gborges.xml` were captured from the working
+checkout on 2026-05-02. To advance to newer upstream:
 
 ```
-# in each working copy under device/brcm/, external/, etc.
-git fetch origin android-16.0
-git rev-parse origin/android-16.0
+# in each working copy under device/brcm/, external/, device/gborges, etc.
+git fetch origin <upstream-branch>     # android-16.0 for brcm, main for gborges
+git rev-parse origin/<upstream-branch>
 ```
 
-Replace the matching `revision="..."` in `brcm.xml`, commit, push.
-The `upstream="android-16.0"` attribute is informational — `repo sync`
+Replace the matching `revision="..."` in the corresponding manifest file,
+commit, push. The `upstream="..."` attribute is informational — `repo sync`
 honors `revision` exclusively.
 
 ## Bumping the AOSP base version
