@@ -6,66 +6,88 @@ combination of:
 - `repo init -u https://android.googlesource.com/platform/manifest -b android-16.0.0_r4`
 - the Raspberry Vanilla local manifests in `.repo/local_manifests/`
 
-with a single, reproducible source.
+with a single git repo that vendors both upstreams as folder snapshots, plus
+gborges-owned projects on top.
 
-## Files
+## Layout
 
-- `default.xml` — top-level. `<include>`s the three below in order.
-- `aosp.xml` — verbatim copy of `platform/manifest @ refs/tags/android-16.0.0_r4`
-  (1045 lines). Re-copy from upstream when bumping the AOSP base version.
-- `brcm.xml` — Raspberry Vanilla projects merged from upstream
-  ([raspberry-vanilla/android_local_manifest](https://github.com/raspberry-vanilla/android_local_manifest))
-  with every `revision="android-16.0"` replaced by a specific commit SHA.
-  No floating branches — sync results are reproducible.
-- `gborges.xml` — gborges-owned projects from
-  [GB-AAOS](https://github.com/GB-AAOS) (currently `device/gborges` →
-  [device_gborges](https://github.com/GB-AAOS/device_gborges)). Same SHA-pin
-  policy as `brcm.xml`.
+```
+manifest/
+├── default.xml             top-level — <include>s the three sources below
+├── google/                 verbatim snapshot of platform/manifest
+│   ├── default.xml             (1045 lines, AOSP base)
+│   └── SOURCE.md               provenance + bump procedure
+├── raspberry-vanilla/      verbatim snapshot of raspberry-vanilla/android_local_manifest
+│   ├── manifest_brcm_rpi.xml   wired in
+│   ├── manifest_utilities.xml  wired in
+│   ├── remove_projects.xml     available, not wired (opt-in for shallow sync)
+│   ├── README.md               upstream's README, kept for reference
+│   └── SOURCE.md               provenance + bump procedure
+└── gborges.xml             gborges-owned projects (GB-AAOS/*)
+```
 
-Include order: aosp → brcm → gborges. brcm's `<remove-project>` directives
-depend on AOSP entries already being present; gborges sits last so it can
-override anything in either file if needed.
+`google/` and `raspberry-vanilla/` are byte-identical copies of their
+upstreams as of the snapshot commit recorded in each folder's `SOURCE.md`.
+`gborges.xml` is first-party and lives at the root.
+
+## Include order
+
+`default.xml` includes:
+
+1. `google/default.xml` — AOSP base, must come first (provides the projects
+   the next layer overrides).
+2. `raspberry-vanilla/manifest_brcm_rpi.xml` — `<remove-project>` + project
+   overrides for build/, camera, ffmpeg, graphics, etc.
+3. `raspberry-vanilla/manifest_utilities.xml` — Pi-utils + V4L-utils.
+4. `gborges.xml` — last, so it can override anything above.
+
+`remove_projects.xml` is commented out in `default.xml`. Uncomment it to
+strip unused `device/amlogic`, `device/linaro`, and similar projects from
+the sync — matches the upstream raspberry-vanilla shallow-clone recipe.
+
+## Reproducibility model
+
+Each snapshot folder is a verbatim copy of upstream at a specific commit.
+Inside the snapshot XMLs, project revisions are floating branches
+(`revision="android-16.0"` etc.). **Reproducibility lives at the
+manifest-repo git layer**: a given commit of this manifest repo always
+points at the same snapshot files, but `repo sync` against those XMLs
+will pull the current HEAD of the branches they name.
+
+If you need stricter pinning (every project locked to a specific commit
+SHA so re-syncs never drift), replace branch names with SHAs inside the
+snapshot XMLs after copying them in. Trade-off: you lose the
+"verbatim upstream" property and have to do the SHA-rewrite step on every
+bump.
 
 ## Using it
 
 Publish this directory as a git repo (any host), then on a fresh tree:
 
-```
+```sh
 repo init -u <manifest-repo-url> -b <branch>
 repo sync -j$(nproc)
 ```
 
-For local testing without publishing, point `repo init` at the directory:
+Local testing without publishing:
 
-```
+```sh
 repo init -u file:///mnt/build/aosp/manifest -b main
 ```
 
 (requires the manifest dir to be a git repo with at least one commit on the
-named branch).
+named branch — already initialised here on `main`).
 
-## Bumping pinned SHAs
+## Bumping
 
-The SHAs in `brcm.xml` and `gborges.xml` were captured from the working
-checkout on 2026-05-02. To advance to newer upstream:
+- **AOSP base version** — see `google/SOURCE.md`. Re-clone
+  `platform/manifest`, check out the new tag, copy `default.xml` over,
+  update the SHA/date/tag rows in `SOURCE.md`.
+- **Raspberry Vanilla** — see `raspberry-vanilla/SOURCE.md`. Re-clone the
+  upstream repo, check out `android-16.0`, copy the four files over,
+  update the SHA/date/subject rows in `SOURCE.md`.
+- **gborges** — edit `revision="..."` in `gborges.xml` directly. Tracks
+  `main` of `GB-AAOS/device_gborges` (and any future GB-AAOS projects
+  added to that file).
 
-```
-# in each working copy under device/brcm/, external/, device/gborges, etc.
-git fetch origin <upstream-branch>     # android-16.0 for brcm, main for gborges
-git rev-parse origin/<upstream-branch>
-```
-
-Replace the matching `revision="..."` in the corresponding manifest file,
-commit, push. The `upstream="..."` attribute is informational — `repo sync`
-honors `revision` exclusively.
-
-## Bumping the AOSP base version
-
-Re-copy from the upstream manifest repo:
-
-```
-curl -sLo aosp.xml https://android.googlesource.com/platform/manifest/+/refs/tags/<new-tag>/default.xml?format=TEXT | base64 -d
-```
-
-or `git clone https://android.googlesource.com/platform/manifest`,
-checkout the desired tag, and copy `default.xml` into this dir.
+After any bump, commit the manifest repo and re-`repo sync` consumers.

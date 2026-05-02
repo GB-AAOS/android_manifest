@@ -8,6 +8,6 @@
 <manifest>
   <remote name="gb-aaos" fetch="https://github.com/GB-AAOS/" />
 
-  <project path="device/gborges" name="device_gborges" remote="gb-aaos" revision="6a75dcd94cfca65f363febae5aedaa1f53cfeaf2" upstream="main" />
+  <project path="device/gborges" name="device_gborges" remote="gb-aaos" upstream="main" />
 
 </manifest>

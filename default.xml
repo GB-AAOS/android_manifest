@@ -1,19 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  gborges AOSP manifest — composes:
-    1. aosp.xml    — verbatim copy of platform/manifest @ refs/tags/android-16.0.0_r4
-    2. brcm.xml    — Raspberry Vanilla projects
-                     (https://github.com/raspberry-vanilla/android_local_manifest)
-                     pinned to specific commit SHAs (no floating branches)
-    3. gborges.xml — gborges-owned projects (device/gborges, …) from
-                     https://github.com/GB-AAOS, also pinned to SHAs
+  gborges AOSP manifest — composes three sources:
 
-  Order matters: aosp.xml must come first so the <remove-project> directives
-  in brcm.xml can resolve their targets. gborges.xml comes last so it can
-  override anything in either file if needed.
+    1. google/default.xml                   verbatim AOSP platform/manifest
+                                            (see google/SOURCE.md)
+    2. raspberry-vanilla/manifest_brcm_rpi.xml
+       raspberry-vanilla/manifest_utilities.xml
+                                            verbatim Raspberry Vanilla local
+                                            manifest (see raspberry-vanilla/SOURCE.md)
+    3. gborges.xml                          gborges-owned projects (GB-AAOS/*)
+
+  Order matters: google/ must come first so the <remove-project> directives
+  in raspberry-vanilla/ can resolve their targets. gborges sits last to
+  override anything in either source if needed.
+
+  Optional: uncomment the remove_projects.xml include below to strip unused
+  device/* and prebuilt projects (shrinks `repo sync` substantially —
+  matches the upstream raspberry-vanilla "shallow clone" recipe).
 -->
 <manifest>
-  <include name="aosp.xml" />
-  <include name="brcm.xml" />
+  <include name="google/default.xml" />
+  <include name="raspberry-vanilla/manifest_brcm_rpi.xml" />
+  <include name="raspberry-vanilla/manifest_utilities.xml" />
+  <!-- <include name="raspberry-vanilla/remove_projects.xml" /> -->
   <include name="gborges.xml" />
 </manifest>
