@@ -1,13 +1,13 @@
 # gborges manifest
 
-A standalone repo manifest for AOSP 16 on Raspberry Pi 4 / Pi 5. Replaces the
-combination of:
+A standalone repo manifest for AOSP 16 on Raspberry Pi 4 / Pi 5. Replaces
+the combination of:
 
 - `repo init -u https://android.googlesource.com/platform/manifest -b android-16.0.0_r4`
 - the Raspberry Vanilla local manifests in `.repo/local_manifests/`
 
-with a single git repo that vendors both upstreams as folder snapshots, plus
-gborges-owned projects on top.
+with a single git repo that vendors both upstreams as folder snapshots,
+plus gborges-owned projects on top.
 
 **Repo URL:** <https://github.com/GB-AAOS/android_manifest>
 **Branch:** `main`
@@ -60,7 +60,7 @@ If you need stricter pinning (every project locked to a specific commit
 SHA so re-syncs never drift), replace branch names with SHAs inside the
 snapshot XMLs after copying them in.
 
-## Build
+## Build (Pi 4 / Pi 5)
 
 ### 1. Prerequisites (Ubuntu 22.04+)
 
@@ -83,23 +83,18 @@ repo sync -j$(nproc)
 
 ```sh
 source build/envsetup.sh
-lunch gbrpi4_car-bp4a-userdebug      # or any target from the table below
+lunch gbrpi4_car-bp4a-userdebug      # or gbrpi5_car-bp4a-userdebug
 ```
 
-| target                          | board / device | variant | build ID |
-|--------------------------------|----------------|---------|----------|
-| `gbrpi4_car-bp4a-userdebug`     | Pi 4 (hardware) | Automotive | bp4a |
-| `gbrpi5_car-bp4a-userdebug`     | Pi 5 (hardware) | Automotive | bp4a |
-| `tonal_emulator-bp4a-userdebug` | x86_64 emulator | Automotive demo with fake proximity sensor + monitor app | bp4a |
+| target                          | board   | variant | build ID |
+|--------------------------------|---------|---------|----------|
+| `gbrpi4_car-bp4a-userdebug`     | Pi 4    | Automotive | bp4a |
+| `gbrpi5_car-bp4a-userdebug`     | Pi 5    | Automotive | bp4a |
 
 Build ID `bp4a` matches AOSP's `android-16.0.0_r4` release. The variant
 suffix can be `user`, `userdebug`, or `eng`.
 
 ### 4. Compile
-
-The build & deploy flow diverges per target type.
-
-#### Pi 4 / Pi 5 hardware (`gbrpi4_car`, `gbrpi5_car`)
 
 ```sh
 make bootimage systemimage vendorimage -j$(nproc)
@@ -107,10 +102,10 @@ make bootimage systemimage vendorimage -j$(nproc)
 
 `bootimage`, `systemimage`, and `vendorimage` are the three partition
 images the flashable `.img` builder needs. A full `make -j$(nproc)` also
-works but takes longer and produces nothing the SD-card image can use that
-the three partition targets don't already cover.
+works but takes longer and produces nothing the SD-card image can use
+that the three partition targets don't already cover.
 
-Then package and flash:
+### 5. Package and flash
 
 ```sh
 ./rpi4-mkimg.sh             # writes a flashable .img into ${ANDROID_PRODUCT_OUT}
@@ -128,29 +123,12 @@ device is found, so they are safe to run interactively.
 See `device/gborges/README.md` for board-specific config (CAN bus on
 Waveshare RS485 CAN HAT, GPIO via libgpiod, board/variant split, etc.).
 
-#### Emulator (`tonal_emulator`)
+## Other targets
 
-Emulator targets do not produce SD-card partition images — build the
-whole tree, then launch under QEMU:
-
-```sh
-m -j$(nproc)
-emulator
-```
-
-The `tonal_emulator` device adds a fake proximity sensor (Sensors
-Multi-HAL 2.1, sinusoidal output) and a pre-installed monitoring app on
-top of an Automotive base. Useful runtime hooks:
-
-```sh
-adb shell setprop vendor.proximity.override 0.7   # force sensor value
-adb shell setprop vendor.proximity.override -1.0  # back to sinusoidal
-adb shell dumpsys sensorservice | grep -A 10 "Proximity Fake Sensor"
-adb logcat -s ProximityMonitorApp
-```
-
-See `device/gborges/tonal_emulator/README.md` for sensor wiring,
-SEPolicy notes, and the design document.
+The manifest also pulls `device/gborges/tonal_emulator`, a phone-emulator
+target with a fake proximity sensor and monitor app. Build and run
+instructions live with that project — see
+<https://github.com/GB-AAOS/device-gborges-tonal_emulator>.
 
 ## Bumping
 
