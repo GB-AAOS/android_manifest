@@ -19,14 +19,14 @@
            upstream="gbrpi-0.24.13" />
 
   <!-- NanoNNG -->
-  <project path="external/nng" name="external_nanonng"
+  <project path="external/nanonng" name="external_nanonng"
            remote="gb-aaos"
            revision="refs/heads/gbrpi-95d675bc"
            upstream="gbrpi-95d675bc" />
 
   <!-- mdnsresponder fork -->
   <remove-project name="platform/external/mdnsresponder" />
-  <project path="external/mdnsresponder" name="external_mdns"
+  <project path="external/mdnsresponder" name="external_mdnsresponder"
            remote="gb-aaos"
            revision="refs/heads/gbrpi-android-16.0.0_r4"
            upstream="gbrpi-android-16.0.0_r4" />
