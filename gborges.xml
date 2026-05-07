@@ -10,22 +10,23 @@
 
   <project path="device/gborges" name="device_gborges" remote="gb-aaos" revision="refs/heads/main" upstream="main" />
   <project path="device/gborges/tonal_emulator" name="device-gborges-tonal_emulator" remote="gb-aaos" revision="refs/heads/main" upstream="main" />
+  <project path="vendor/gborges/vhal" name="vendor_gborges_vhal" remote="gb-aaos" revision="refs/heads/main" upstream="main" />
 
   <!-- NanoMQ MQTT broker fork -->
-  <project path="external/nanomq" name="nanomq"
+  <project path="external/nanomq" name="external_nanomq"
            remote="gb-aaos"
            revision="refs/heads/gbrpi-0.24.13"
            upstream="gbrpi-0.24.13" />
 
   <!-- NanoNNG -->
-  <project path="external/nng" name="NanoNNG"
+  <project path="external/nng" name="external_nanonng"
            remote="gb-aaos"
            revision="refs/heads/gbrpi-95d675bc"
            upstream="gbrpi-95d675bc" />
 
   <!-- mdnsresponder fork -->
   <remove-project name="platform/external/mdnsresponder" />
-  <project path="external/mdnsresponder" name="external-mdns"
+  <project path="external/mdnsresponder" name="external_mdns"
            remote="gb-aaos"
            revision="refs/heads/gbrpi-android-16.0.0_r4"
            upstream="gbrpi-android-16.0.0_r4" />
